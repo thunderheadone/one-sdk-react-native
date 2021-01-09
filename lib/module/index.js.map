@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.tsx"],"names":["NativeModules","One"],"mappings":"AAAA,SAASA,aAAT,QAA8B,cAA9B;AACA,MAAM;AAAEC,EAAAA;AAAF,IAAUD,aAAhB;AACA,eAAeC,GAAf","sourcesContent":["import { NativeModules } from 'react-native';\nconst { One } = NativeModules;\nexport default One;"]}
