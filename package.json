@@ -37,7 +37,7 @@
     "android"
   ],
   "repository": "https://github.com/thunderheadone/one-sdk-react-native",
-  "author": "Thunderhead One, Inc. <react@thunderhead.com> (https://www.thunderhead.com/)",
+  "author": "Thunderhead One, Inc. <react-native@thunderhead.com> (https://www.thunderhead.com/)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/thunderheadone/one-sdk-react-native/issues"
