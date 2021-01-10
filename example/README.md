@@ -3,8 +3,9 @@
 A React Native example to demonstrate how to integrate and use the Thunderhead React Native Module.
 
 ### Install Thunderhead Module
+
 ```
-$ npm install
+$ yarn bootstrap
 ```
 
 ### Start React Native app in iOS
