@@ -1,6 +1,6 @@
 ## React Native Example
 
-A React Native example to demonstrate how to integrate and use the Thunderhead React Native Module. Before you run the commands mentioned below, ensure you have cd'ed into the example folder.
+A React Native example to demonstrate how to integrate and use the Thunderhead React Native Module. Before you run the commands mentioned below, ensure you have `cd`'ed into the example folder.
 
 ### Install Thunderhead Module
 
