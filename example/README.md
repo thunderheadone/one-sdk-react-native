@@ -7,6 +7,10 @@ A React Native example to demonstrate how to integrate and use the Thunderhead R
 ```
 $ yarn bootstrap
 ```
+### Add the SDK configuration parameters
+
+In order to see requests being sent, you will need to add valid credentials as part of the [config file](https://github.com/thunderheadone/one-sdk-react-native/blob/master/example/config/one.js) used by the example app.
+
 
 ### Start React Native app in iOS
 
