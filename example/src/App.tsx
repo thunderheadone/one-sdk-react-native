@@ -12,19 +12,20 @@ import {
   ScrollView,
   NativeModules,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 
-import { ONE_PARAMETERS } from '../config/one';
-
+const ONE_PARAMETERS = require('../config/one');
 const One = NativeModules.One;
 const interaction = '/Interaction';
 const properties = { key: 'value' };
 
-class AwesomeProject extends Component {
-  constructor() {
-    super();
+class ExampleProject extends Component {
+  constructor(props: any) {
+    super(props);
     One.enableLogging(true);
 
+    console.log('site key = ' + ONE_PARAMETERS.siteKey);
     // Init ONE
     One.init(
       ONE_PARAMETERS.siteKey,
@@ -40,10 +41,10 @@ class AwesomeProject extends Component {
   _onSendInteractionWithPropertiesButtonPress = () => {
     console.log('Sending interaction with properties...');
     One.sendInteraction(interaction, properties).then(
-      (response) => {
+      (response: any) => {
         console.log(response);
       },
-      (error) => {
+      (error: any) => {
         console.log(error);
       }
     );
@@ -52,10 +53,10 @@ class AwesomeProject extends Component {
   _onSendInteractionWithoutPropertiesButtonPress = () => {
     console.log('Sending interaction without properties...');
     One.sendInteraction(interaction, null).then(
-      (response) => {
+      (response: any) => {
         console.log(response);
       },
-      (error) => {
+      (error: any) => {
         console.log(error);
       }
     );
@@ -77,13 +78,13 @@ class AwesomeProject extends Component {
 
   _onGetTidButtonPress = () => {
     console.log('Getting tid...');
-    One.getTid().then((tid) => {
-      alert(tid);
+    One.getTid().then((tid: string) => {
+      Alert.alert(tid);
       console.log(tid);
     });
   };
 
-  renderHeader = (title) => {
+  renderHeader = (title: any) => {
     return (
       <View style={styles.header}>
         <Text style={styles.headerText}>{title}</Text>
@@ -91,7 +92,7 @@ class AwesomeProject extends Component {
     );
   };
 
-  renderButton = (key, title, onPress) => {
+  renderButton = (key: any, title: any, onPress: any) => {
     return (
       <TouchableOpacity key={key} onPress={onPress}>
         <Text style={styles.buttonText}>{title}</Text>
@@ -99,7 +100,7 @@ class AwesomeProject extends Component {
     );
   };
 
-  renderSection = (name, sectionStyle) => {
+  renderSection = (name: any, sectionStyle: any) => {
     return (
       <View>
         <Text style={sectionStyle}>{name}</Text>
@@ -113,7 +114,7 @@ class AwesomeProject extends Component {
       <View style={styles.rootView}>
         {this.renderHeader('React Example')}
         <ScrollView contentContainerStyle={styles.scrollView}>
-          <View style={styles.scrollViewContents}>
+          <View>
             {this.renderSection('Send Interaction', styles.section)}
             {this.renderButton(
               'send_interaction_with_properties',
@@ -204,4 +205,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AwesomeProject;
+export default ExampleProject;
