@@ -12,10 +12,9 @@ import {
   ScrollView,
   NativeModules,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 
-const ONE_PARAMETERS = require('../config/one');
+import { ONE_PARAMETERS } from '../config/one';
 const One = NativeModules.One;
 const interaction = '/Interaction';
 const properties = { key: 'value' };
@@ -25,7 +24,6 @@ class ExampleProject extends Component {
     super(props);
     One.enableLogging(true);
 
-    console.log('site key = ' + ONE_PARAMETERS.siteKey);
     // Init ONE
     One.init(
       ONE_PARAMETERS.siteKey,
@@ -41,7 +39,8 @@ class ExampleProject extends Component {
   _onSendInteractionWithPropertiesButtonPress = () => {
     console.log('Sending interaction with properties...');
     One.sendInteraction(interaction, properties).then(
-      (response: any) => {
+      (response: Object) => {
+        console.log("response = ");
         console.log(response);
       },
       (error: any) => {
@@ -53,7 +52,8 @@ class ExampleProject extends Component {
   _onSendInteractionWithoutPropertiesButtonPress = () => {
     console.log('Sending interaction without properties...');
     One.sendInteraction(interaction, null).then(
-      (response: any) => {
+      (response: Object) => {
+        console.log("response = ");
         console.log(response);
       },
       (error: any) => {
@@ -63,12 +63,12 @@ class ExampleProject extends Component {
   };
 
   _onSendPropertiesButtonPress = () => {
-    console.log('Sending properties...');
+    console.log('Sent properties...');
     One.sendProperties(interaction, properties);
   };
 
   _onSendResponseCodeButtonPress = () => {
-    console.log('Sending response code...');
+    console.log('Sent response code...');
     // This is just an example response code. A response code would
     // typically be returned in an optimization.
     var responseCode =
@@ -78,9 +78,9 @@ class ExampleProject extends Component {
 
   _onGetTidButtonPress = () => {
     console.log('Getting tid...');
-    One.getTid().then((tid: string) => {
-      Alert.alert(tid);
-      console.log(tid);
+    One.getTid().then((tid: String) => {
+      alert(tid);
+      console.log("tid = " + tid);
     });
   };
 
@@ -114,7 +114,7 @@ class ExampleProject extends Component {
       <View style={styles.rootView}>
         {this.renderHeader('React Example')}
         <ScrollView contentContainerStyle={styles.scrollView}>
-          <View>
+          <View style={styles.scrollViewContents}>
             {this.renderSection('Send Interaction', styles.section)}
             {this.renderButton(
               'send_interaction_with_properties',
