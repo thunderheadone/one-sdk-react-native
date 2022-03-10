@@ -1,47 +1,58 @@
-/*
- *   OneModule.java
- *   Thunderhead
- *
- *   Copyright © 2017 Thunderhead. All rights reserved.
- */
+// OneModule.java
 
 package com.reactnativeone;
 
-import com.facebook.react.bridge.Promise;
+import android.os.Build;
+import android.util.Log;
+
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.Promise;
+
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.bridge.WritableMap;
-import com.thunderhead.One;
-import com.thunderhead.OneLogLevel;
-import com.thunderhead.OneModes;
-import com.thunderhead.android.api.codeless.OneCodelessInteractionTrackingConfiguration;
-import com.thunderhead.android.api.configuration.OneConfiguration;
-import com.thunderhead.android.api.interactions.OneCall;
-import com.thunderhead.android.api.interactions.OneCallback;
-import com.thunderhead.android.api.interactions.OneInteractionPath;
-import com.thunderhead.android.api.interactions.OneRequest;
-import com.thunderhead.android.api.interactions.OneResponseCode;
-import com.thunderhead.android.api.interactions.OneResponseCodeRequest;
-import com.thunderhead.android.api.responsetypes.OneAPIError;
-import com.thunderhead.android.api.responsetypes.OneResponse;
-import com.thunderhead.android.api.responsetypes.OneSDKError;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableNativeMap;
+import com.thunderhead.mobile.One;
+import com.thunderhead.mobile.codeless.OneCodelessInteractionTrackingConfiguration;
+import com.thunderhead.mobile.configuration.OneConfiguration;
+import com.thunderhead.mobile.configuration.OneMode;
+import com.thunderhead.mobile.interactions.OneInteractionPath;
+import com.thunderhead.mobile.interactions.OneRequest;
+import com.thunderhead.mobile.interactions.OneResponseCode;
+import com.thunderhead.mobile.interactions.OneResponseCodeRequest;
+import com.thunderhead.mobile.logging.OneLogComponent;
+import com.thunderhead.mobile.logging.OneLogLevel;
+import com.thunderhead.mobile.logging.OneLoggingConfiguration;
+import com.thunderhead.mobile.optout.OneOptOutConfiguration;
 
-import org.jetbrains.annotations.NotNull;
+import com.thunderhead.mobile.responsetypes.OneAPIError;
+import com.thunderhead.mobile.responsetypes.OneResponse;
+import com.thunderhead.mobile.responsetypes.OneSDKError;
+import com.thunderhead.mobile.responsetypes.OptimizationPoint;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 public class OneModule extends ReactContextBaseJavaModule {
 
+  private final ReactApplicationContext reactContext;
+
+  protected static final String LOG_TAG = "OneModule";
+  private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
   public OneModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    this.reactContext = reactContext;
   }
 
   @Override
@@ -60,7 +71,7 @@ public class OneModule extends ReactContextBaseJavaModule {
       .userId(userId)
       .host(URI.create(hostName))
       .touchpoint(URI.create(touchpointUri))
-      .mode(isAdminMode ? OneModes.ADMIN_MODE : OneModes.USER_MODE)
+      .mode(isAdminMode ? OneMode.ADMIN : OneMode.USER)
       .build();
 
     One.setConfiguration(oneConfiguration);
@@ -72,62 +83,84 @@ public class OneModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void sendInteraction(String interaction, ReadableMap propertiesMap, final Promise promise) {
+  public void sendInteraction(String interactionPath, ReadableMap propertiesMap, final Promise promise) {
     HashMap<String, String> properties = getPropertiesFromReadableMap(propertiesMap);
     final OneRequest sendInteractionRequest = new OneRequest.Builder()
-      .interactionPath(new OneInteractionPath(URI.create(interaction)))
+      .interactionPath(new OneInteractionPath(URI.create(interactionPath)))
       .properties(properties)
       .build();
-    final OneCall sendInteractionCall = One.sendInteraction(sendInteractionRequest);
-
-    if (promise == null) {
-      sendInteractionCall.enqueue(null);
-    } else {
-      sendInteractionCall.enqueue(new OneCallback() {
-        @Override
-        public void onSuccess(@NotNull OneResponse oneResponse) {
-          notifyResult(promise,
-            "{\"captures: " + oneResponse.getCaptures().toString() + ", " +
-                  "\"interactionPath\": \"" + oneResponse.getInteractionPath().getValue().toString() + "\", " +
-                  "\"optimizations: " + oneResponse.getOptimizations().toString() + ", " +
-                  "\"statusCode\": " + oneResponse.getHttpStatusCode() + ", " +
-                  "\"tid\": \"" + oneResponse.getTid() + "\", " +
-                  "\"trackers\": " + oneResponse.getTrackers().toString() + "}"
-          );
+    executor.submit(() -> {
+      try {
+        OneResponse response;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+          response = One.sendInteraction(true, sendInteractionRequest).join();
+        } else {
+          response = One.sendInteractionLegacySupport(true, sendInteractionRequest).join();
         }
-
-        @Override
-        public void onError(@NotNull OneSDKError oneSDKError) {
-          notifyProblem(promise, "" + oneSDKError.getSystemCode(), oneSDKError.getErrorMessage());
-        }
-
-        @Override
-        public void onFailure(@NotNull OneAPIError oneAPIError) {
-          notifyProblem(promise, "" + oneAPIError.getHttpStatusCode(), oneAPIError.getErrorMessage());
-        }
-      });
-    }
+        One.processResponse(response);
+        WritableNativeMap responseMap = responseObjectToReadableMap(response);
+        notifyResult(promise, responseMap);
+      } catch (ExecutionException error) {
+        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+        Log.e(LOG_TAG, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
+      } catch (OneSDKError error) {
+        notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
+        Log.e(LOG_TAG, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
+      } catch (OneAPIError error) {
+        notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
+        Log.e(LOG_TAG, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
+      }
+    });
   }
 
   @ReactMethod
-  public void sendProperties(String interaction, ReadableMap propertiesMap) {
+  public void sendProperties(String interactionPath, ReadableMap propertiesMap) {
     HashMap<String, String> properties = getPropertiesFromReadableMap(propertiesMap);
-    final OneRequest sendPropertiesRequest = new OneRequest.Builder()
-      .interactionPath(new OneInteractionPath(URI.create(interaction)))
+    final OneRequest sendInteractionRequest = new OneRequest.Builder()
+      .interactionPath(new OneInteractionPath(URI.create(interactionPath)))
       .properties(properties)
       .build();
-
-    final OneCall sendPropertiesCall = One.sendProperties(sendPropertiesRequest);
-    sendPropertiesCall.enqueue(null);
+    executor.submit(() -> {
+      try {
+        OneResponse response;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+          response = One.sendInteraction(true, sendInteractionRequest).join();
+        } else {
+          response = One.sendInteractionLegacySupport(true, sendInteractionRequest).join();
+        }
+        One.processResponse(response);
+      } catch (ExecutionException error) {
+        Log.e(LOG_TAG, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
+      } catch (OneSDKError error) {
+        Log.e(LOG_TAG, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
+      } catch (OneAPIError error) {
+        Log.e(LOG_TAG, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
+      }
+    });
   }
 
   @ReactMethod
-  public void sendResponseCode(String responseCode, String interaction) {
-    final OneResponseCodeRequest responseCodeRequest = new OneResponseCodeRequest.Builder()
-      .responseCode(new OneResponseCode(responseCode))
-      .interactionPath(new OneInteractionPath(URI.create(interaction)))
-      .build();
-    One.sendResponseCode(responseCodeRequest).enqueue(null);
+  public void sendResponseCode(String responseCode, String interactionPath) {
+    executor.submit(() -> {
+      final OneResponseCodeRequest responseCodeRequest = new OneResponseCodeRequest.Builder()
+        .responseCode(new OneResponseCode(responseCode))
+        .interactionPath(new OneInteractionPath(URI.create(interactionPath)))
+        .build();
+
+      try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+          One.sendResponseCode(true, responseCodeRequest);
+        } else {
+          One.sendResponseCodeLegacySupport(true, responseCodeRequest);
+        }
+      } catch (ExecutionException error) {
+        Log.e(LOG_TAG, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
+      } catch (OneSDKError error) {
+        Log.e(LOG_TAG, "[Thunderhead] Send Response Code SDK Error: " + error.getErrorMessage());
+      } catch (OneAPIError error) {
+        Log.e(LOG_TAG, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
+      }
+    });
   }
 
   @ReactMethod
@@ -136,41 +169,30 @@ public class OneModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void setLogLevel(Integer logLevel) {
-    One.setLogLevel(logLevelFromInteger(logLevel));
-  }
-
-  @Override
-  public Map<String, Object> getConstants() {
-    /*
-     * Export the SDK's log levels to js. They will be accessible
-     * like this: One.LogLevelNone, One.LogLevelWebService,
-     * One.LogLevelFramework and One.LogLevelAll
-     */
-    final Map<String, Object> constants = new HashMap<>();
-    constants.put("LogLevelNone", 0);
-    constants.put("LogLevelWebService", 1);
-    constants.put("LogLevelFramework", 2);
-    constants.put("LogLevelAll", 3);
-    return constants;
-  }
-
-  private OneLogLevel logLevelFromInteger(Integer logLevel) {
-    OneLogLevel level;
-    switch (logLevel) {
-      case 1:
-        level = OneLogLevel.WEB_SERVICE;
-        break;
-      case 2:
-        level = OneLogLevel.FRAMEWORK;
-        break;
-      case 3:
-        level = OneLogLevel.ALL;
-        break;
-      default:
-        level = OneLogLevel.NONE;
+  public void enableLogging(Boolean enabled) {
+    if (enabled == null) {
+      enabled = true;
     }
-    return level;
+
+    OneLoggingConfiguration.Builder builder = OneLoggingConfiguration.builder().log(OneLogComponent.ANY);
+    if (enabled) {
+      builder.log(OneLogLevel.VERBOSE).log(OneLogLevel.DEBUG);
+    } else {
+      builder.log(OneLogLevel.WARN).log(OneLogLevel.ERROR);
+    }
+    One.setLoggingConfiguration(builder.build());
+  }
+
+  @ReactMethod
+  public void optOut(Boolean optOut) {
+    OneOptOutConfiguration.Builder builder = new OneOptOutConfiguration.Builder();
+
+    if (optOut == null) {
+      optOut = false;
+    }
+
+    builder.optOut(optOut);
+    One.setOptOutConfiguration(builder.build());
   }
 
   private HashMap<String, String> getPropertiesFromReadableMap(ReadableMap readableMap) {
@@ -206,6 +228,35 @@ public class OneModule extends ReactContextBaseJavaModule {
     return result;
   }
 
+  // Convert OneResponse Class to HashMap so React can read it.
+  private WritableNativeMap responseObjectToReadableMap(OneResponse response) {
+    HashMap<String, Object> responseMap = new HashMap<>();
+    WritableNativeMap writableMap = new WritableNativeMap();
+
+    writableMap.putString("tid", response.getTid());
+    writableMap.putString("interactionPath", response.getInteractionPath().getValue().getPath());
+
+    if (!response.getOptimizationPoints().isEmpty()) {
+      WritableNativeArray writableOptimizationsArray = new WritableNativeArray();
+
+      for (OptimizationPoint point : response.getOptimizationPoints()) {
+        WritableNativeMap writableOptimizationPointMap = new WritableNativeMap();
+
+        writableOptimizationPointMap.putString("data", point.getData());
+        writableOptimizationPointMap.putString("path", point.getPath());
+        writableOptimizationPointMap.putString("responseId", point.getResponseId());
+        writableOptimizationPointMap.putString("dataMimeType", point.getDataMimeType());
+        writableOptimizationPointMap.putString("directives", point.getDirectives());
+        writableOptimizationPointMap.putString("name", point.getName());
+        writableOptimizationPointMap.putString("viewPointName", point.getViewPointName());
+        writableOptimizationPointMap.putString("viewPointId", point.getViewPointId());
+        writableOptimizationsArray.pushMap(writableOptimizationPointMap);
+      }
+      writableMap.putArray("optimizations", writableOptimizationsArray);
+    }
+    return writableMap;
+  }
+
   private void notifyProblem(Promise promise, Throwable throwable) {
     /*
      * We have to catch the rejection to prevent the following exception:
@@ -232,7 +283,7 @@ public class OneModule extends ReactContextBaseJavaModule {
     }
   }
 
-  private void notifyResult(Promise promise, String result) {
+  private void notifyResult(Promise promise, Object result) {
     try {
       promise.resolve(result);
     } catch (RuntimeException e) {
