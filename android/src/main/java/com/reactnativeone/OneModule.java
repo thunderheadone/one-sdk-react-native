@@ -45,20 +45,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 public class OneModule extends ReactContextBaseJavaModule {
-
-  private final ReactApplicationContext reactContext;
-
-  protected static final String LOG_TAG = "OneModule";
+  protected static final String NAME = "OneModule";
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
   public OneModule(ReactApplicationContext reactContext) {
     super(reactContext);
-    this.reactContext = reactContext;
   }
 
   @Override
   public String getName() {
-    return "One";
+    return NAME;
   }
 
   @ReactMethod
@@ -103,13 +99,13 @@ public class OneModule extends ReactContextBaseJavaModule {
         notifyResult(promise, responseMap);
       } catch (ExecutionException error) {
         notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-        Log.e(LOG_TAG, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
+        Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
       } catch (OneSDKError error) {
         notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-        Log.e(LOG_TAG, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
+        Log.e(NAME, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
       } catch (OneAPIError error) {
         notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-        Log.e(LOG_TAG, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
+        Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
       }
     });
   }
@@ -131,11 +127,11 @@ public class OneModule extends ReactContextBaseJavaModule {
         }
         One.processResponse(response);
       } catch (ExecutionException error) {
-        Log.e(LOG_TAG, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
+        Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
       } catch (OneSDKError error) {
-        Log.e(LOG_TAG, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
+        Log.e(NAME, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
       } catch (OneAPIError error) {
-        Log.e(LOG_TAG, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
+        Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
       }
     });
   }
@@ -155,11 +151,11 @@ public class OneModule extends ReactContextBaseJavaModule {
           One.sendResponseCodeLegacySupport(true, responseCodeRequest);
         }
       } catch (ExecutionException error) {
-        Log.e(LOG_TAG, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
+        Log.e(NAME, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
       } catch (OneSDKError error) {
-        Log.e(LOG_TAG, "[Thunderhead] Send Response Code SDK Error: " + error.getErrorMessage());
+        Log.e(NAME, "[Thunderhead] Send Response Code SDK Error: " + error.getErrorMessage());
       } catch (OneAPIError error) {
-        Log.e(LOG_TAG, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
+        Log.e(NAME, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
       }
     });
   }
