@@ -28,6 +28,7 @@ import com.thunderhead.mobile.interactions.OneResponseCodeRequest;
 import com.thunderhead.mobile.logging.OneLogComponent;
 import com.thunderhead.mobile.logging.OneLogLevel;
 import com.thunderhead.mobile.logging.OneLoggingConfiguration;
+import com.thunderhead.mobile.optout.OneOptInOptions;
 import com.thunderhead.mobile.optout.OneOptOutConfiguration;
 
 import com.thunderhead.mobile.responsetypes.OneAPIError;
@@ -37,8 +38,8 @@ import com.thunderhead.mobile.responsetypes.OptimizationPoint;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
@@ -192,6 +193,23 @@ public class OneModule extends ReactContextBaseJavaModule {
     }
 
     builder.optOut(optOut);
+    One.setOptOutConfiguration(builder.build());
+  }
+
+  @ReactMethod
+  public void optOutCityCountryDetection(Boolean optOut) {
+    OneOptOutConfiguration.Builder builder = new OneOptOutConfiguration.Builder();
+
+    if (optOut == null) {
+      optOut = false;
+    }
+
+    EnumSet<OneOptInOptions> optInOptions = EnumSet.noneOf(OneOptInOptions.class);
+    if (!optOut) {
+      optInOptions.add(OneOptInOptions.CITY_COUNTRY_DETECTION);
+    }
+    builder.optOut(false);
+    builder.optInOptions(optInOptions);
     One.setOptOutConfiguration(builder.build());
   }
 

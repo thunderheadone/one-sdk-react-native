@@ -33,7 +33,7 @@ repositories {
   }
 }
 ```
-*Note:* 
+*Note:*
 * Requires minimum API level 21+.
 
 ## Usage
@@ -67,7 +67,7 @@ One.init(
 ```
 * See example of usage [here](https://github.com/thunderheadone/one-sdk-react-native/tree/master/example/src/App.tsx#L34)
 
-### Send an Interaction 
+### Send an Interaction
 To send an Interaction request without properties, call the following method:
 ```javascript
 One.sendInteraction("/interactionPath", null);
@@ -86,6 +86,26 @@ To get the tid for the current app, call the following public method:
 One.getTid();
 ```
 * See example of usage [here](https://github.com/thunderheadone/one-sdk-react-native/tree/master/example/src/App.tsx#L78)
+
+### Opt an end-user out of tracking
+To opt an end-user out of all tracking options, when the end-user does not give permission to be tracked in the client app, call the following method:
+```javascript
+// Opts out of all tracking options.
+One.optOut(true);
+```
+
+To opt back in, call the following method:
+```javascript
+// Opt in for all tracking options.
+One.optOut(false);
+```
+
+#### Opt an end user out of city country level tracking
+To opt an end-user out of city/country level tracking, call the following method:
+```javascript
+// Calling this method will opt the end-user back in for all tracking.
+One.optOutCityCountryDetection(true);
+```
 
 ### Access debug information
 To configure logging, call the following method:
