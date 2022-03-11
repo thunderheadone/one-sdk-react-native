@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 public class OneModule extends ReactContextBaseJavaModule {
-  protected static final String NAME = "OneModule";
+  protected static final String NAME = "One";
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
   public OneModule(ReactApplicationContext reactContext) {
