@@ -111,9 +111,9 @@ public class OneModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void sendProperties(String interactionPath, ReadableMap propertiesMap) {
+  public void sendProperties(String interactionPath, ReadableMap propertiesMap, final Promise promise) {
     HashMap<String, String> properties = getPropertiesFromReadableMap(propertiesMap);
-    final OneRequest sendInteractionRequest = new OneRequest.Builder()
+    final OneRequest sendPropertiesRequest = new OneRequest.Builder()
       .interactionPath(new OneInteractionPath(URI.create(interactionPath)))
       .properties(properties)
       .build();
@@ -121,23 +121,28 @@ public class OneModule extends ReactContextBaseJavaModule {
       try {
         OneResponse response;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-          response = One.sendInteraction(true, sendInteractionRequest).join();
+          response = One.sendProperties(true, sendPropertiesRequest).join();
         } else {
-          response = One.sendInteractionLegacySupport(true, sendInteractionRequest).join();
+          response = One.sendPropertiesLegacySupport(true, sendPropertiesRequest).join();
         }
         One.processResponse(response);
+        WritableNativeMap responseMap = responseObjectToReadableMap(response);
+        notifyResult(promise, responseMap);
       } catch (ExecutionException error) {
-        Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
+        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+        Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
       } catch (OneSDKError error) {
-        Log.e(NAME, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
+        notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
+        Log.e(NAME, "[Thunderhead] Send Properties SDK Error: " + error.getErrorMessage());
       } catch (OneAPIError error) {
-        Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
+        notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
+        Log.e(NAME, "[Thunderhead] Send Properties Api Error: " + error.getErrorMessage());
       }
     });
   }
 
   @ReactMethod
-  public void sendResponseCode(String responseCode, String interactionPath) {
+  public void sendResponseCode(String interactionPath, String responseCode, final Promise promise) {
     executor.submit(() -> {
       final OneResponseCodeRequest responseCodeRequest = new OneResponseCodeRequest.Builder()
         .responseCode(new OneResponseCode(responseCode))
@@ -150,11 +155,15 @@ public class OneModule extends ReactContextBaseJavaModule {
         } else {
           One.sendResponseCodeLegacySupport(true, responseCodeRequest);
         }
+        notifyResult(promise, null);
       } catch (ExecutionException error) {
+        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
         Log.e(NAME, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
       } catch (OneSDKError error) {
+        notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
         Log.e(NAME, "[Thunderhead] Send Response Code SDK Error: " + error.getErrorMessage());
       } catch (OneAPIError error) {
+        notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
         Log.e(NAME, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
       }
     });
@@ -244,31 +253,34 @@ public class OneModule extends ReactContextBaseJavaModule {
 
   // Convert OneResponse Class to HashMap so React can read it.
   private WritableNativeMap responseObjectToReadableMap(OneResponse response) {
-    HashMap<String, Object> responseMap = new HashMap<>();
-    WritableNativeMap writableMap = new WritableNativeMap();
+    if (response != null) {
+      HashMap<String, Object> responseMap = new HashMap<>();
+      WritableNativeMap writableMap = new WritableNativeMap();
 
-    writableMap.putString("tid", response.getTid());
-    writableMap.putString("interactionPath", response.getInteractionPath().getValue().getPath());
+      writableMap.putString("tid", response.getTid());
+      writableMap.putString("interactionPath", response.getInteractionPath().getValue().getPath());
 
-    if (!response.getOptimizationPoints().isEmpty()) {
-      WritableNativeArray writableOptimizationsArray = new WritableNativeArray();
+      if (!response.getOptimizationPoints().isEmpty()) {
+        WritableNativeArray writableOptimizationsArray = new WritableNativeArray();
 
-      for (OptimizationPoint point : response.getOptimizationPoints()) {
-        WritableNativeMap writableOptimizationPointMap = new WritableNativeMap();
+        for (OptimizationPoint point : response.getOptimizationPoints()) {
+          WritableNativeMap writableOptimizationPointMap = new WritableNativeMap();
 
-        writableOptimizationPointMap.putString("data", point.getData());
-        writableOptimizationPointMap.putString("path", point.getPath());
-        writableOptimizationPointMap.putString("responseId", point.getResponseId());
-        writableOptimizationPointMap.putString("dataMimeType", point.getDataMimeType());
-        writableOptimizationPointMap.putString("directives", point.getDirectives());
-        writableOptimizationPointMap.putString("name", point.getName());
-        writableOptimizationPointMap.putString("viewPointName", point.getViewPointName());
-        writableOptimizationPointMap.putString("viewPointId", point.getViewPointId());
-        writableOptimizationsArray.pushMap(writableOptimizationPointMap);
+          writableOptimizationPointMap.putString("data", point.getData());
+          writableOptimizationPointMap.putString("path", point.getPath());
+          writableOptimizationPointMap.putString("responseId", point.getResponseId());
+          writableOptimizationPointMap.putString("dataMimeType", point.getDataMimeType());
+          writableOptimizationPointMap.putString("directives", point.getDirectives());
+          writableOptimizationPointMap.putString("name", point.getName());
+          writableOptimizationPointMap.putString("viewPointName", point.getViewPointName());
+          writableOptimizationPointMap.putString("viewPointId", point.getViewPointId());
+          writableOptimizationsArray.pushMap(writableOptimizationPointMap);
+        }
+        writableMap.putArray("optimizations", writableOptimizationsArray);
       }
-      writableMap.putArray("optimizations", writableOptimizationsArray);
+      return writableMap;
     }
-    return writableMap;
+    return null;
   }
 
   private void notifyProblem(Promise promise, Throwable throwable) {
@@ -291,7 +303,7 @@ public class OneModule extends ReactContextBaseJavaModule {
 
   private void notifyProblem(Promise promise, String code, String message) {
     try {
-      promise.reject(code, message, (WritableMap) null);
+      promise.reject(code, message, null);
     } catch (RuntimeException e) {
       e.printStackTrace();
     }
