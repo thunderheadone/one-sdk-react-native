@@ -303,7 +303,7 @@ public class OneModule extends ReactContextBaseJavaModule {
 
   private void notifyProblem(Promise promise, String code, String message) {
     try {
-      promise.reject(code, message, null);
+      promise.reject(code, message, (WritableMap) null);
     } catch (RuntimeException e) {
       e.printStackTrace();
     }
