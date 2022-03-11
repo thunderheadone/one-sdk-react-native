@@ -12,17 +12,18 @@ import {
   ScrollView,
   NativeModules,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 
 import { ONE_PARAMETERS } from '../config/one';
-const One = NativeModules.One;
+import One from 'react-native-one';
 const interaction = '/Interaction';
 const properties = { key: 'value' };
 
 class ExampleProject extends Component {
   constructor(props: any) {
     super(props);
-    One.enableLogging(true);
+    One.enableLogging(false);
 
     // Init ONE
     One.init(
@@ -37,34 +38,45 @@ class ExampleProject extends Component {
   }
 
   _onSendInteractionWithPropertiesButtonPress = () => {
-    console.log('Sending interaction with properties...');
+    console.log('Sending interaction with Properties...');
     One.sendInteraction(interaction, properties).then(
-      (response: Object) => {
-        console.log("response = ");
-        console.log(response);
+      (response: any) => {
+        console.log('response = ' + JSON.stringify(response));
+        Alert.alert('Success response =', JSON.stringify(response));
       },
       (error: any) => {
         console.log(error);
+        Alert.alert('Error =', JSON.stringify(error));
       }
     );
   };
 
   _onSendInteractionWithoutPropertiesButtonPress = () => {
-    console.log('Sending interaction without properties...');
+    console.log('Sending interaction without Properties...');
     One.sendInteraction(interaction, null).then(
-      (response: Object) => {
-        console.log("response = ");
-        console.log(response);
+      (response: any) => {
+        console.log('response = ' + JSON.stringify(response));
+        Alert.alert('Success response =', JSON.stringify(response));
       },
       (error: any) => {
         console.log(error);
+        Alert.alert('Error =', JSON.stringify(error));
       }
     );
   };
 
   _onSendPropertiesButtonPress = () => {
     console.log('Sent properties...');
-    One.sendProperties(interaction, properties);
+    One.sendProperties(interaction, properties).then(
+       (response: any) => {
+         console.log('response = ' + JSON.stringify(response));
+         Alert.alert('Success response =', JSON.stringify(response));
+       },
+       (error: any) => {
+         console.log(error);
+         Alert.alert('Error =', JSON.stringify(error));
+       }
+    );
   };
 
   _onSendResponseCodeButtonPress = () => {
@@ -73,14 +85,22 @@ class ExampleProject extends Component {
     // typically be returned in an optimization.
     var responseCode =
       'dGlkPThmZDhkZmIwLTIwNzAtNDk5ZC04NjczLWEyM2YxNDNiYjhlNSxhYz0yOTAzMjM5OTcsY250PTI5NzIyNDA0MCxvcD0xNjkxNTc5MzAscnQ9UE9TSVRJVkVfQ0xJQ0ssc2s9T05FLUFUN0JUU0ExSEotNzQyMg';
-    One.sendResponseCode(responseCode, interaction);
+    One.sendResponseCode("/home", responseCode).then(
+      (response: any) => {
+        Alert.alert('Send response code success');
+      },
+      (error: any) => {
+        console.log(error);
+        Alert.alert('Error =', JSON.stringify(error));
+      }
+    );
   };
 
   _onGetTidButtonPress = () => {
     console.log('Getting tid...');
     One.getTid().then((tid: String) => {
-      alert(tid);
-      console.log("tid = " + tid);
+      Alert.alert('Tid = ', tid);
+      console.log('tid = ' + tid);
     });
   };
 
@@ -118,12 +138,12 @@ class ExampleProject extends Component {
             {this.renderSection('Send Interaction', styles.section)}
             {this.renderButton(
               'send_interaction_with_properties',
-              'Send Interaction with properties',
+              'Send Interaction with Properties',
               this._onSendInteractionWithPropertiesButtonPress
             )}
             {this.renderButton(
               'send_interaction_without_properties',
-              'Send Interaction without properties',
+              'Send Interaction without Properties',
               this._onSendInteractionWithoutPropertiesButtonPress
             )}
 
