@@ -157,9 +157,9 @@ public class OneModule extends ReactContextBaseJavaModule {
 
       try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-          One.sendResponseCode(true, responseCodeRequest);
+          One.sendResponseCode(true, responseCodeRequest).join();
         } else {
-          One.sendResponseCodeLegacySupport(true, responseCodeRequest);
+          One.sendResponseCodeLegacySupport(true, responseCodeRequest).join();
         }
         notifyResult(promise, null);
       } catch (ExecutionException error) {
