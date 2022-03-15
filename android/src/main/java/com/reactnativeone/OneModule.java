@@ -106,6 +106,9 @@ public class OneModule extends ReactContextBaseJavaModule {
       } catch (OneAPIError error) {
         notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
         Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
+      } catch (Exception error) {
+        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+        Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
       }
     });
   }
@@ -137,6 +140,9 @@ public class OneModule extends ReactContextBaseJavaModule {
       } catch (OneAPIError error) {
         notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
         Log.e(NAME, "[Thunderhead] Send Properties Api Error: " + error.getErrorMessage());
+      } catch (Exception error) {
+        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+        Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
       }
     });
   }
@@ -165,6 +171,9 @@ public class OneModule extends ReactContextBaseJavaModule {
       } catch (OneAPIError error) {
         notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
         Log.e(NAME, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
+      } catch (Exception error) {
+        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+        Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
       }
     });
   }

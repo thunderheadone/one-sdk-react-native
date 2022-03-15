@@ -10,7 +10,6 @@ import {
   Text,
   View,
   ScrollView,
-  NativeModules,
   TouchableOpacity,
   Alert,
 } from 'react-native';
@@ -23,7 +22,7 @@ const properties = { key: 'value' };
 class ExampleProject extends Component {
   constructor(props: any) {
     super(props);
-    One.enableLogging(false);
+    One.enableLogging(true);
 
     // Init ONE
     One.init(
@@ -46,7 +45,7 @@ class ExampleProject extends Component {
       },
       (error: any) => {
         console.log(error);
-        Alert.alert('Error =', JSON.stringify(error));
+        Alert.alert('Error response = ', JSON.stringify(error));
       }
     );
   };
@@ -60,7 +59,7 @@ class ExampleProject extends Component {
       },
       (error: any) => {
         console.log(error);
-        Alert.alert('Error =', JSON.stringify(error));
+        Alert.alert('Error response =', JSON.stringify(error));
       }
     );
   };
@@ -68,30 +67,31 @@ class ExampleProject extends Component {
   _onSendPropertiesButtonPress = () => {
     console.log('Sent properties...');
     One.sendProperties(interaction, properties).then(
-       (response: any) => {
-         console.log('response = ' + JSON.stringify(response));
-         Alert.alert('Success response =', JSON.stringify(response));
-       },
-       (error: any) => {
-         console.log(error);
-         Alert.alert('Error =', JSON.stringify(error));
-       }
+      (response: any) => {
+        console.log('response = ' + JSON.stringify(response));
+        Alert.alert('Success response =', JSON.stringify(response));
+      },
+      (error: any) => {
+        console.log(error);
+        Alert.alert('Error response =', JSON.stringify(error));
+      }
     );
   };
 
   _onSendResponseCodeButtonPress = () => {
-    console.log('Sent response code...');
+    console.log('Sending response code...');
     // This is just an example response code. A response code would
     // typically be returned in an optimization.
     var responseCode =
       'dGlkPThmZDhkZmIwLTIwNzAtNDk5ZC04NjczLWEyM2YxNDNiYjhlNSxhYz0yOTAzMjM5OTcsY250PTI5NzIyNDA0MCxvcD0xNjkxNTc5MzAscnQ9UE9TSVRJVkVfQ0xJQ0ssc2s9T05FLUFUN0JUU0ExSEotNzQyMg';
-    One.sendResponseCode("/home", responseCode).then(
-      (response: any) => {
+    One.sendResponseCode('/home', responseCode).then(
+      (success: any) => {
+        console.log('Send response code success');
         Alert.alert('Send response code success');
       },
       (error: any) => {
         console.log(error);
-        Alert.alert('Error =', JSON.stringify(error));
+        Alert.alert('Error response =', JSON.stringify(error));
       }
     );
   };
