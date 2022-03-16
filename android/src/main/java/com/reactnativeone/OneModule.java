@@ -40,6 +40,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
@@ -47,6 +48,7 @@ import java.util.concurrent.ExecutorService;
 public class OneModule extends ReactContextBaseJavaModule {
   protected static final String NAME = "One";
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
+  private static final boolean THROW_ERRORS = true;
 
   public OneModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -86,30 +88,51 @@ public class OneModule extends ReactContextBaseJavaModule {
       .interactionPath(new OneInteractionPath(URI.create(interactionPath)))
       .properties(properties)
       .build();
+
     executor.submit(() -> {
-      try {
-        OneResponse response;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-          response = One.sendInteraction(true, sendInteractionRequest).join();
-        } else {
-          response = One.sendInteractionLegacySupport(true, sendInteractionRequest).join();
+      OneResponse response;
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        try {
+          response = One.sendInteraction(THROW_ERRORS, sendInteractionRequest).join();
+          WritableNativeMap responseMap = responseObjectToReadableMap(response);
+          notifyResult(promise, responseMap);
+        } catch (ExecutionException error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
+        } catch (OneSDKError error) {
+          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
+        } catch (OneAPIError error) {
+          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
+        } catch (CompletionException error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getLocalizedMessage());
+        } catch (Exception error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
         }
-        One.processResponse(response);
-        WritableNativeMap responseMap = responseObjectToReadableMap(response);
-        notifyResult(promise, responseMap);
-      } catch (ExecutionException error) {
-        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
-      } catch (OneSDKError error) {
-        notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
-      } catch (OneAPIError error) {
-        notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
-      } catch (Exception error) {
-        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+      } else {
+        try {
+          response = One.sendInteractionLegacySupport(THROW_ERRORS, sendInteractionRequest).join();
+          WritableNativeMap responseMap = responseObjectToReadableMap(response);
+          notifyResult(promise, responseMap);
+        } catch (ExecutionException error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
+        } catch (OneSDKError error) {
+          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
+        } catch (OneAPIError error) {
+          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
+        } catch (Exception error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+        }
       }
+      WritableNativeMap responseMap = responseObjectToReadableMap(response);
+      notifyResult(promise, responseMap);
     });
   }
 
@@ -121,28 +144,47 @@ public class OneModule extends ReactContextBaseJavaModule {
       .properties(properties)
       .build();
     executor.submit(() -> {
-      try {
-        OneResponse response;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-          response = One.sendProperties(true, sendPropertiesRequest).join();
-        } else {
-          response = One.sendPropertiesLegacySupport(true, sendPropertiesRequest).join();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        try {
+          OneResponse response;
+          response = One.sendProperties(THROW_ERRORS, sendPropertiesRequest).join();
+          WritableNativeMap responseMap = responseObjectToReadableMap(response);
+          notifyResult(promise, responseMap);
+        } catch (ExecutionException error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
+        } catch (OneSDKError error) {
+          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties SDK Error: " + error.getErrorMessage());
+        } catch (OneAPIError error) {
+          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties Api Error: " + error.getErrorMessage());
+        } catch (CompletionException error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getLocalizedMessage());
+        } catch (Exception error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
         }
-        One.processResponse(response);
-        WritableNativeMap responseMap = responseObjectToReadableMap(response);
-        notifyResult(promise, responseMap);
-      } catch (ExecutionException error) {
-        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
-      } catch (OneSDKError error) {
-        notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Properties SDK Error: " + error.getErrorMessage());
-      } catch (OneAPIError error) {
-        notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Properties Api Error: " + error.getErrorMessage());
-      } catch (Exception error) {
-        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+      } else {
+        try {
+          OneResponse response;
+          response = One.sendPropertiesLegacySupport(THROW_ERRORS, sendPropertiesRequest).join();
+          WritableNativeMap responseMap = responseObjectToReadableMap(response);
+          notifyResult(promise, responseMap);
+        } catch (ExecutionException error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
+        } catch (OneSDKError error) {
+          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties SDK Error: " + error.getErrorMessage());
+        } catch (OneAPIError error) {
+          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties Api Error: " + error.getErrorMessage());
+        } catch (Exception error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+        }
       }
     });
   }
@@ -154,27 +196,45 @@ public class OneModule extends ReactContextBaseJavaModule {
         .responseCode(new OneResponseCode(responseCode))
         .interactionPath(new OneInteractionPath(URI.create(interactionPath)))
         .build();
-
-      try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-          One.sendResponseCode(true, responseCodeRequest).join();
-        } else {
-          One.sendResponseCodeLegacySupport(true, responseCodeRequest).join();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        try {
+          One.sendResponseCode(THROW_ERRORS, responseCodeRequest).join();
+          notifyResult(promise, null);
+        } catch (ExecutionException error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
+        } catch (OneSDKError error) {
+          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Response Code SDK Error: " + error.getErrorMessage());
+        } catch (OneAPIError error) {
+          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
+        } catch (CompletionException error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getLocalizedMessage());
+        } catch (Exception error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
         }
-        notifyResult(promise, null);
-      } catch (ExecutionException error) {
-        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
-      } catch (OneSDKError error) {
-        notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Response Code SDK Error: " + error.getErrorMessage());
-      } catch (OneAPIError error) {
-        notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
-      } catch (Exception error) {
-        notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-        Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+      } else {
+        try {
+          One.sendResponseCodeLegacySupport(THROW_ERRORS, responseCodeRequest).join();
+          notifyResult(promise, null);
+        } catch (ExecutionException error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
+        } catch (OneSDKError error) {
+          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Response Code SDK Error: " + error.getErrorMessage());
+        } catch (OneAPIError error) {
+          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
+        } catch (Exception error) {
+          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+        }
       }
+
     });
   }
 

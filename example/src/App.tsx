@@ -37,70 +37,70 @@ class ExampleProject extends Component {
   }
 
   _onSendInteractionWithPropertiesButtonPress = () => {
-    console.log('Sending interaction with Properties...');
+    console.info('Sending interaction with Properties...');
     One.sendInteraction(interaction, properties).then(
       (response: any) => {
-        console.log('response = ' + JSON.stringify(response));
+        console.info('response = ' + JSON.stringify(response));
         Alert.alert('Success response =', JSON.stringify(response));
       },
       (error: any) => {
-        console.log(error);
+        console.error(error);
         Alert.alert('Error response = ', JSON.stringify(error));
       }
     );
   };
 
   _onSendInteractionWithoutPropertiesButtonPress = () => {
-    console.log('Sending interaction without Properties...');
+    console.info('Sending interaction without Properties...');
     One.sendInteraction(interaction, null).then(
       (response: any) => {
         console.log('response = ' + JSON.stringify(response));
         Alert.alert('Success response =', JSON.stringify(response));
       },
       (error: any) => {
-        console.log(error);
+        console.error(error);
         Alert.alert('Error response =', JSON.stringify(error));
       }
     );
   };
 
   _onSendPropertiesButtonPress = () => {
-    console.log('Sent properties...');
+    console.info('Sent properties...');
     One.sendProperties(interaction, properties).then(
       (response: any) => {
-        console.log('response = ' + JSON.stringify(response));
+        console.info('response = ' + JSON.stringify(response));
         Alert.alert('Success response =', JSON.stringify(response));
       },
       (error: any) => {
-        console.log(error);
+        console.error(error);
         Alert.alert('Error response =', JSON.stringify(error));
       }
     );
   };
 
   _onSendResponseCodeButtonPress = () => {
-    console.log('Sending response code...');
+    console.info('Sending response code...');
     // This is just an example response code. A response code would
     // typically be returned in an optimization.
     var responseCode =
       'dGlkPThmZDhkZmIwLTIwNzAtNDk5ZC04NjczLWEyM2YxNDNiYjhlNSxhYz0yOTAzMjM5OTcsY250PTI5NzIyNDA0MCxvcD0xNjkxNTc5MzAscnQ9UE9TSVRJVkVfQ0xJQ0ssc2s9T05FLUFUN0JUU0ExSEotNzQyMg';
     One.sendResponseCode('/home', responseCode).then(
       (success: any) => {
-        console.log('Send response code success');
+        console.info('Send response code success');
         Alert.alert('Send response code success');
       },
       (error: any) => {
-        console.log(error);
+        console.error(error);
         Alert.alert('Error response =', JSON.stringify(error));
       }
     );
   };
 
   _onGetTidButtonPress = () => {
-    console.log('Getting tid...');
+    console.info('Getting tid...');
     One.getTid().then((tid: String) => {
       Alert.alert('Tid = ', tid);
-      console.log('tid = ' + tid);
+      console.info('tid = ' + tid);
     });
   };
 
