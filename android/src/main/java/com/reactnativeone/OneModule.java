@@ -40,6 +40,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -97,7 +98,7 @@ public class OneModule extends ReactContextBaseJavaModule {
           WritableNativeMap responseMap = responseObjectToReadableMap(response);
           notifyResult(promise, responseMap);
         } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
         } catch (OneSDKError error) {
           notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
@@ -106,7 +107,7 @@ public class OneModule extends ReactContextBaseJavaModule {
           notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
         } catch (CompletionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getLocalizedMessage());
         } catch (Exception error) {
           notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
@@ -118,7 +119,7 @@ public class OneModule extends ReactContextBaseJavaModule {
           WritableNativeMap responseMap = responseObjectToReadableMap(response);
           notifyResult(promise, responseMap);
         } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
         } catch (OneSDKError error) {
           notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
@@ -151,7 +152,7 @@ public class OneModule extends ReactContextBaseJavaModule {
           WritableNativeMap responseMap = responseObjectToReadableMap(response);
           notifyResult(promise, responseMap);
         } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
         } catch (OneSDKError error) {
           notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
@@ -160,8 +161,8 @@ public class OneModule extends ReactContextBaseJavaModule {
           notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Properties Api Error: " + error.getErrorMessage());
         } catch (CompletionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getLocalizedMessage());
+          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
         } catch (Exception error) {
           notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
@@ -173,7 +174,7 @@ public class OneModule extends ReactContextBaseJavaModule {
           WritableNativeMap responseMap = responseObjectToReadableMap(response);
           notifyResult(promise, responseMap);
         } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
         } catch (OneSDKError error) {
           notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
@@ -201,7 +202,7 @@ public class OneModule extends ReactContextBaseJavaModule {
           One.sendResponseCode(THROW_ERRORS, responseCodeRequest).join();
           notifyResult(promise, null);
         } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
         } catch (OneSDKError error) {
           notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
@@ -210,8 +211,8 @@ public class OneModule extends ReactContextBaseJavaModule {
           notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
         } catch (CompletionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getLocalizedMessage());
+          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
+          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
         } catch (Exception error) {
           notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
@@ -221,7 +222,7 @@ public class OneModule extends ReactContextBaseJavaModule {
           One.sendResponseCodeLegacySupport(THROW_ERRORS, responseCodeRequest).join();
           notifyResult(promise, null);
         } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
+          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
           Log.e(NAME, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
         } catch (OneSDKError error) {
           notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
@@ -251,7 +252,7 @@ public class OneModule extends ReactContextBaseJavaModule {
 
     OneLoggingConfiguration.Builder builder = OneLoggingConfiguration.builder().log(OneLogComponent.ANY);
     if (enabled) {
-      builder.log(OneLogLevel.VERBOSE).log(OneLogLevel.DEBUG);
+      builder.log(OneLogLevel.VERBOSE);
     } else {
       builder.log(OneLogLevel.WARN).log(OneLogLevel.ERROR);
     }
