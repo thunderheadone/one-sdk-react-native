@@ -14,7 +14,6 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableNativeMap;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.thunderhead.mobile.One;
@@ -97,39 +96,16 @@ public class OneModule extends ReactContextBaseJavaModule {
           response = One.sendInteraction(THROW_ERRORS, sendInteractionRequest).join();
           WritableNativeMap responseMap = responseObjectToReadableMap(response);
           notifyResult(promise, responseMap);
-        } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
-        } catch (OneSDKError error) {
-          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
-        } catch (OneAPIError error) {
-          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
-        } catch (CompletionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getLocalizedMessage());
         } catch (Exception error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+          notifyProblem(promise, "Send Interaction", error);
         }
       } else {
         try {
           response = One.sendInteractionLegacySupport(THROW_ERRORS, sendInteractionRequest).join();
           WritableNativeMap responseMap = responseObjectToReadableMap(response);
           notifyResult(promise, responseMap);
-        } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Completion Error: " + error.getCause());
-        } catch (OneSDKError error) {
-          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction SDK Error: " + error.getErrorMessage());
-        } catch (OneAPIError error) {
-          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Api Error: " + error.getErrorMessage());
         } catch (Exception error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+          notifyProblem(promise, "Send Interaction", error);
         }
       }
       WritableNativeMap responseMap = responseObjectToReadableMap(response);
@@ -151,21 +127,8 @@ public class OneModule extends ReactContextBaseJavaModule {
           response = One.sendProperties(THROW_ERRORS, sendPropertiesRequest).join();
           WritableNativeMap responseMap = responseObjectToReadableMap(response);
           notifyResult(promise, responseMap);
-        } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
-        } catch (OneSDKError error) {
-          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties SDK Error: " + error.getErrorMessage());
-        } catch (OneAPIError error) {
-          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties Api Error: " + error.getErrorMessage());
-        } catch (CompletionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
         } catch (Exception error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+          notifyProblem(promise, "Send Properties", error);
         }
       } else {
         try {
@@ -173,18 +136,8 @@ public class OneModule extends ReactContextBaseJavaModule {
           response = One.sendPropertiesLegacySupport(THROW_ERRORS, sendPropertiesRequest).join();
           WritableNativeMap responseMap = responseObjectToReadableMap(response);
           notifyResult(promise, responseMap);
-        } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
-        } catch (OneSDKError error) {
-          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties SDK Error: " + error.getErrorMessage());
-        } catch (OneAPIError error) {
-          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties Api Error: " + error.getErrorMessage());
         } catch (Exception error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+          notifyProblem(promise, "Send Properties", error);
         }
       }
     });
@@ -201,41 +154,17 @@ public class OneModule extends ReactContextBaseJavaModule {
         try {
           One.sendResponseCode(THROW_ERRORS, responseCodeRequest).join();
           notifyResult(promise, null);
-        } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
-        } catch (OneSDKError error) {
-          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Response Code SDK Error: " + error.getErrorMessage());
-        } catch (OneAPIError error) {
-          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
-        } catch (CompletionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Properties Completion Error: " + error.getCause());
         } catch (Exception error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+          notifyProblem(promise, "Send Response Code", error);
         }
       } else {
         try {
           One.sendResponseCodeLegacySupport(THROW_ERRORS, responseCodeRequest).join();
           notifyResult(promise, null);
-        } catch (ExecutionException error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), Objects.requireNonNull(error.getCause()).getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Response Code Completion Error: " + error.getCause());
-        } catch (OneSDKError error) {
-          notifyProblem(promise, Integer.toString(error.getSystemCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Response Code SDK Error: " + error.getErrorMessage());
-        } catch (OneAPIError error) {
-          notifyProblem(promise, Integer.toString(error.getHttpStatusCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Response Code Api Error: " + error.getErrorMessage());
         } catch (Exception error) {
-          notifyProblem(promise, Integer.toString(error.hashCode()), error.getLocalizedMessage());
-          Log.e(NAME, "[Thunderhead] Send Interaction Error: " + error.getLocalizedMessage());
+          notifyProblem(promise, "Send Response Code", error);
         }
       }
-
     });
   }
 
@@ -371,9 +300,22 @@ public class OneModule extends ReactContextBaseJavaModule {
     }
   }
 
-  private void notifyProblem(Promise promise, String code, String message) {
+  private void notifyProblem(Promise promise, String message, Throwable throwable) {
+    String fullErrorMessage;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && throwable instanceof CompletionException) {
+      fullErrorMessage = message + " ExecutionException Error";
+    } else if (throwable instanceof OneSDKError) {
+      fullErrorMessage = message + " OneSDKError Error";
+    } else if (throwable instanceof OneAPIError) {
+      fullErrorMessage = message + " OneAPIError Error";
+    } else if (throwable instanceof ExecutionException) {
+      fullErrorMessage = message + " ExecutionException Error";
+    } else {
+      fullErrorMessage = message + " Error";
+    }
     try {
-      promise.reject(code, message, (WritableMap) null);
+      promise.reject(OneModule.NAME, fullErrorMessage, throwable);
+      Log.e(OneModule.NAME, fullErrorMessage, throwable);
     } catch (RuntimeException e) {
       e.printStackTrace();
     }
