@@ -108,8 +108,6 @@ public class OneModule extends ReactContextBaseJavaModule {
           notifyProblem(promise, "Send Interaction", error);
         }
       }
-      WritableNativeMap responseMap = responseObjectToReadableMap(response);
-      notifyResult(promise, responseMap);
     });
   }
 
@@ -215,6 +213,11 @@ public class OneModule extends ReactContextBaseJavaModule {
     builder.optOut(false);
     builder.optInOptions(optInOptions);
     One.setOptOutConfiguration(builder.build());
+  }
+
+  @ReactMethod
+  public void optOutKeychainTidStorage(Boolean optOut) {
+    // Do nothing. This is an iOS only method.
   }
 
   private HashMap<String, String> getPropertiesFromReadableMap(ReadableMap readableMap) {
