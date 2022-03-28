@@ -107,6 +107,12 @@ To opt an end-user out of city/country level tracking, call the following method
 One.optOutCityCountryDetection(true);
 ```
 
+#### Opt an end user out of keychain Tid storage (iOS only)
+To opt an end-user out of all keychain Tid storage, call the following method:
+```javascript
+One.optOutKeychainTidStorage(true);
+```
+
 ### Access debug information
 To configure logging, call the following method:
 ```javascript
