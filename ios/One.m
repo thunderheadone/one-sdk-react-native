@@ -40,7 +40,7 @@ RCT_EXPORT_METHOD(sendInteraction:(NSString *)interaction
 // The parameters of this method have been swapped in this method
 // declaration in order to reconcile with the ONE SDK for Android
 // and Javascript.
-RCT_EXPORT_METHOD(sendProperties:(NSString *)interaction 
+RCT_EXPORT_METHOD(sendProperties:(NSString *)interaction
                   forInteraction:(NSDictionary *)properties)
 {
     [One sendProperties:properties forInteractionPath:interaction];
@@ -56,13 +56,32 @@ RCT_EXPORT_METHOD(sendResponseCode:(NSString *)responseCode forInteraction:(NSSt
     [One sendResponseCode:responseCode forInteractionPath:interaction];
 }
 
+RCT_EXPORT_METHOD(optOut:(BOOL)optOut)
+{
+    [One opt:optOut ? Out : In forOptions:AllTracking];
+}
+
+RCT_EXPORT_METHOD(optOutCityCountryDetection:(BOOL)optOut)
+{
+    // Calling this method opts the user back in to match Android wipe and replace behavior.
+    [One opt:In forOptions:AllTracking];
+
+    NSNumber *optOutValue = call.arguments[@"optOut"];
+    [One opt:optOut ? Out : In forOptions:CityCountryDetection];
+}
+
+RCT_EXPORT_METHOD(optOutKeychainTidStorage:(BOOL)optOut)
+{
+    [One opt:optOut ? Out : In forOptions:KeychainTidStorage];
+}
+
 RCT_EXPORT_METHOD(getTid:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
     if (!resolve) {
         return;
     }
-    
+
     resolve([One getTid]);
 }
 
@@ -78,7 +97,7 @@ RCT_EXPORT_METHOD(getTid:(RCTPromiseResolveBlock)resolve
 
 - (NSDictionary *)constantsToExport
 {
-  return @{ 
+  return @{
     @"LogLevelNone" : @(kOneLogLevelNone),
 		@"LogLevelAll" : @(kOneLogLevelAll),
 		@"LogLevelWebService" : @(kOneLogLevelWebService),
