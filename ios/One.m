@@ -18,9 +18,9 @@ RCT_EXPORT_METHOD(init:(NSString *)siteKey uri:(NSString *)uri apiKey:(NSString 
     [One disableAutomaticInteractionDetection:YES];
 }
 
-RCT_EXPORT_METHOD(setLogLevel:(OneLogLevel)level)
+RCT_EXPORT_METHOD(enableLogging:(BOOL)enable)
 {
-    [One setLogLevel:level];
+    [One setLogLevel:enable ? kOneLogLevelAll : kOneLogLevelNone];
 }
 
 RCT_EXPORT_METHOD(sendInteraction:(NSString *)interaction
@@ -65,8 +65,6 @@ RCT_EXPORT_METHOD(optOutCityCountryDetection:(BOOL)optOut)
 {
     // Calling this method opts the user back in to match Android wipe and replace behavior.
     [One opt:In forOptions:AllTracking];
-
-    NSNumber *optOutValue = call.arguments[@"optOut"];
     [One opt:optOut ? Out : In forOptions:CityCountryDetection];
 }
 
@@ -94,16 +92,5 @@ RCT_EXPORT_METHOD(getTid:(RCTPromiseResolveBlock)resolve
 {
     return YES;
 }
-
-- (NSDictionary *)constantsToExport
-{
-  return @{
-    @"LogLevelNone" : @(kOneLogLevelNone),
-		@"LogLevelAll" : @(kOneLogLevelAll),
-		@"LogLevelWebService" : @(kOneLogLevelWebService),
-		@"LogLevelFramework" : @(kOneLogLevelFramework)
-	};
-}
-
 
 @end
