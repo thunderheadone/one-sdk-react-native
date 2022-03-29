@@ -41,9 +41,12 @@ RCT_EXPORT_METHOD(sendInteraction:(NSString *)interaction
 // declaration in order to reconcile with the ONE SDK for Android
 // and Javascript.
 RCT_EXPORT_METHOD(sendProperties:(NSString *)interaction
-                  forInteraction:(NSDictionary *)properties)
+                  properties:(NSDictionary *)properties
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     [One sendProperties:properties forInteractionPath:interaction];
+    resolve(nil);
 }
 
 RCT_EXPORT_METHOD(sendBaseTouchpointProperties:(NSDictionary *)properties)
@@ -51,9 +54,14 @@ RCT_EXPORT_METHOD(sendBaseTouchpointProperties:(NSDictionary *)properties)
     [One sendBaseTouchpointProperties:properties];
 }
 
-RCT_EXPORT_METHOD(sendResponseCode:(NSString *)responseCode forInteraction:(NSString *)interaction)
+RCT_EXPORT_METHOD(sendResponseCode:(NSString *)interaction
+                 responseCode:(NSString *)responseCode
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject
+)
 {
     [One sendResponseCode:responseCode forInteractionPath:interaction];
+    resolve(nil);
 }
 
 RCT_EXPORT_METHOD(optOut:(BOOL)optOut)
