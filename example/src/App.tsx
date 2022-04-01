@@ -65,11 +65,11 @@ class ExampleProject extends Component {
   };
 
   _onSendPropertiesButtonPress = () => {
-    console.info('Sent properties...');
+    console.info('Sending properties...');
     One.sendProperties(interaction, properties).then(
       (response: any) => {
-        console.info('response = ' + JSON.stringify(response));
-        Alert.alert('Success response =', JSON.stringify(response));
+        console.info('Sent properties');
+        Alert.alert('Sent properties');
       },
       (error: any) => {
         console.error(error);
@@ -86,8 +86,8 @@ class ExampleProject extends Component {
       'dGlkPThmZDhkZmIwLTIwNzAtNDk5ZC04NjczLWEyM2YxNDNiYjhlNSxhYz0yOTAzMjM5OTcsY250PTI5NzIyNDA0MCxvcD0xNjkxNTc5MzAscnQ9UE9TSVRJVkVfQ0xJQ0ssc2s9T05FLUFUN0JUU0ExSEotNzQyMg';
     One.sendResponseCode('/home', responseCode).then(
       (success: any) => {
-        console.info('Send response code success');
-        Alert.alert('Send response code success');
+        console.info('Sent response code');
+        Alert.alert('Sent response code');
       },
       (error: any) => {
         console.error(error);

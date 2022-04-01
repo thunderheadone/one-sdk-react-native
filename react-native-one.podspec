@@ -13,12 +13,12 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "10.0" }
   s.source       = { :git => "https://github.com/thunderheadone/one-sdk-react-native.git", :tag => "#{s.version}" }
 
-  
+
   s.source_files = "ios/**/*.{h,m,mm,swift}"
-  
+
 
   s.dependency "React-Core"
-  s.dependency 'Thunderhead', '5.3.3'
+  s.dependency 'Thunderhead', '9.1.0'
   s.static_framework = true
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 end
