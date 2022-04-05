@@ -306,15 +306,23 @@ public class OneModule extends ReactContextBaseJavaModule {
   private void notifyProblem(Promise promise, String message, Throwable throwable) {
     String fullErrorMessage;
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && throwable instanceof CompletionException) {
-      fullErrorMessage = message + " ExecutionException Error";
+      CompletionException exception = (CompletionException)throwable;
+      Throwable cause = exception.getCause();
+      String exceptionMessage;
+      if (cause != null) {
+        exceptionMessage = cause.getLocalizedMessage();
+      } else {
+        exceptionMessage = exception.getLocalizedMessage();
+      }
+      fullErrorMessage = message + " CompletionException Error: " + exceptionMessage;
     } else if (throwable instanceof OneSDKError) {
-      fullErrorMessage = message + " OneSDKError Error";
+      fullErrorMessage = message + " OneSDKError Error: " + throwable.getLocalizedMessage();
     } else if (throwable instanceof OneAPIError) {
-      fullErrorMessage = message + " OneAPIError Error";
+      fullErrorMessage = message + " OneAPIError Error: " + throwable.getLocalizedMessage();
     } else if (throwable instanceof ExecutionException) {
-      fullErrorMessage = message + " ExecutionException Error";
+      fullErrorMessage = message + " ExecutionException Error: " + throwable.getLocalizedMessage();
     } else {
-      fullErrorMessage = message + " Error";
+      fullErrorMessage = message + " Error: " + throwable.getLocalizedMessage();
     }
     try {
       promise.reject(OneModule.NAME, fullErrorMessage, throwable);
