@@ -6,31 +6,25 @@
 
 import React, { Component } from 'react';
 import {
-  AppRegistry,
   StyleSheet,
   Text,
   View,
   ScrollView,
-  Switch,
-  NativeModules,
-  Linking,
   TouchableOpacity,
-  Platform
+  Alert,
 } from 'react-native';
 
-import {ONE_PARAMETERS} from '../config/one'
+import { ONE_PARAMETERS } from '../config/one';
+import One from 'react-native-one';
+const interaction = '/Interaction';
+const properties = { key: 'value' };
 
-const One = NativeModules.One;
-const interaction = "/Interaction";
-const properties = {key:"value"};
+class ExampleProject extends Component {
+  constructor(props: any) {
+    super(props);
+    One.enableLogging(true);
 
-class AwesomeProject extends Component {
-  
-  constructor() {
-    super();
-    One.setLogLevel(One.LogLevelAll)
-
-    // Init ONE 
+    // Init ONE
     One.init(
       ONE_PARAMETERS.siteKey,
       ONE_PARAMETERS.touchpointUri,
@@ -38,93 +32,138 @@ class AwesomeProject extends Component {
       ONE_PARAMETERS.sharedSecret,
       ONE_PARAMETERS.userId,
       ONE_PARAMETERS.adminMode,
-      ONE_PARAMETERS.hostname
+      ONE_PARAMETERS.hostName
     );
   }
 
   _onSendInteractionWithPropertiesButtonPress = () => {
-    console.log("Sending interaction with properties...");
-    One.sendInteraction(interaction, properties).then((response) => {
-      console.log(response);
-    }, (error) => {
-      console.log(error);
-    }) 
+    console.info('Sending interaction with Properties...');
+    One.sendInteraction(interaction, properties).then(
+      (response: any) => {
+        console.info('response = ' + JSON.stringify(response));
+        Alert.alert('Success response =', JSON.stringify(response));
+      },
+      (error: any) => {
+        console.error(error);
+        Alert.alert('Error response = ', JSON.stringify(error));
+      }
+    );
   };
 
   _onSendInteractionWithoutPropertiesButtonPress = () => {
-    console.log("Sending interaction without properties...");
-    One.sendInteraction(interaction, null).then((response) => {
-      console.log(response);
-    },(error) => {
-      console.log(error);
-    }) 
+    console.info('Sending interaction without Properties...');
+    One.sendInteraction(interaction, null).then(
+      (response: any) => {
+        console.log('response = ' + JSON.stringify(response));
+        Alert.alert('Success response =', JSON.stringify(response));
+      },
+      (error: any) => {
+        console.error(error);
+        Alert.alert('Error response =', JSON.stringify(error));
+      }
+    );
   };
 
   _onSendPropertiesButtonPress = () => {
-    console.log("Sending properties...");
-    One.sendProperties(interaction, properties);
+    console.info('Sending properties...');
+    One.sendProperties(interaction, properties).then(
+      (response: any) => {
+        console.info('Sent properties');
+        Alert.alert('Sent properties');
+      },
+      (error: any) => {
+        console.error(error);
+        Alert.alert('Error response =', JSON.stringify(error));
+      }
+    );
   };
 
   _onSendResponseCodeButtonPress = () => {
-    console.log("Sending response code...");
-    // This is just an example response code. A response code would 
+    console.info('Sending response code...');
+    // This is just an example response code. A response code would
     // typically be returned in an optimization.
-    var responseCode = "dGlkPThmZDhkZmIwLTIwNzAtNDk5ZC04NjczLWEyM2YxNDNiYjhlNSxhYz0yOTAzMjM5OTcsY250PTI5NzIyNDA0MCxvcD0xNjkxNTc5MzAscnQ9UE9TSVRJVkVfQ0xJQ0ssc2s9T05FLUFUN0JUU0ExSEotNzQyMg";
-    One.sendResponseCode(responseCode, interaction);
+    var responseCode =
+      'dGlkPThmZDhkZmIwLTIwNzAtNDk5ZC04NjczLWEyM2YxNDNiYjhlNSxhYz0yOTAzMjM5OTcsY250PTI5NzIyNDA0MCxvcD0xNjkxNTc5MzAscnQ9UE9TSVRJVkVfQ0xJQ0ssc2s9T05FLUFUN0JUU0ExSEotNzQyMg';
+    One.sendResponseCode('/home', responseCode).then(
+      (success: any) => {
+        console.info('Sent response code');
+        Alert.alert('Sent response code');
+      },
+      (error: any) => {
+        console.error(error);
+        Alert.alert('Error response =', JSON.stringify(error));
+      }
+    );
   };
 
   _onGetTidButtonPress = () => {
-    console.log("Getting tid...");
-    One.getTid().then((tid) => {
-      alert(tid);
-      console.log(tid);
+    console.info('Getting tid...');
+    One.getTid().then((tid: String) => {
+      Alert.alert('Tid = ', tid);
+      console.info('tid = ' + tid);
     });
   };
 
-  renderHeader = (title) => {
+  renderHeader = (title: any) => {
     return (
       <View style={styles.header}>
         <Text style={styles.headerText}>{title}</Text>
       </View>
     );
-  }
+  };
 
-  renderButton = (key, title, onPress) => {
+  renderButton = (key: any, title: any, onPress: any) => {
     return (
       <TouchableOpacity key={key} onPress={onPress}>
         <Text style={styles.buttonText}>{title}</Text>
       </TouchableOpacity>
     );
-  }
+  };
 
-  renderSection = (name, sectionStyle) => {
+  renderSection = (name: any, sectionStyle: any) => {
     return (
       <View>
         <Text style={sectionStyle}>{name}</Text>
         <View style={styles.line} />
       </View>
-    )
-  }
+    );
+  };
 
   render() {
     return (
       <View style={styles.rootView}>
-        {this.renderHeader("React Example")}
+        {this.renderHeader('React Example')}
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.scrollViewContents}>
-            {this.renderSection("Send Interaction", styles.section)}
-            {this.renderButton("send_interaction_with_properties", "Send Interaction with properties", this._onSendInteractionWithPropertiesButtonPress)}
-            {this.renderButton("send_interaction_without_properties", "Send Interaction without properties", this._onSendInteractionWithoutPropertiesButtonPress)}
+            {this.renderSection('Send Interaction', styles.section)}
+            {this.renderButton(
+              'send_interaction_with_properties',
+              'Send Interaction with Properties',
+              this._onSendInteractionWithPropertiesButtonPress
+            )}
+            {this.renderButton(
+              'send_interaction_without_properties',
+              'Send Interaction without Properties',
+              this._onSendInteractionWithoutPropertiesButtonPress
+            )}
 
-            {this.renderSection("Send Properties", styles.section)}
-            {this.renderButton("send_properties", "Send Properties", this._onSendPropertiesButtonPress)}
-            {this.renderButton("send_response_code", "Send response code", this._onSendResponseCodeButtonPress)}
+            {this.renderSection('Send Properties', styles.section)}
+            {this.renderButton(
+              'send_properties',
+              'Send Properties',
+              this._onSendPropertiesButtonPress
+            )}
+            {this.renderButton(
+              'send_response_code',
+              'Send response code',
+              this._onSendResponseCodeButtonPress
+            )}
 
-            {this.renderSection("Tid", styles.section)}
-            {this.renderButton("get_tid", "Get tid", this._onGetTidButtonPress)}
+            {this.renderSection('Tid', styles.section)}
+            {this.renderButton('get_tid', 'Get tid', this._onGetTidButtonPress)}
           </View>
-         </ScrollView>
-       </View>
+        </ScrollView>
+      </View>
     );
   }
 }
@@ -132,7 +171,7 @@ class AwesomeProject extends Component {
 const styles = StyleSheet.create({
   rootView: {
     flex: 1,
-    backgroundColor: '#1F1D28'
+    backgroundColor: '#1F1D28',
   },
   header: {
     backgroundColor: '#EE5158',
@@ -144,46 +183,46 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     elevation: 2,
-    position: 'relative'
+    position: 'relative',
   },
   headerText: {
     fontSize: 20,
-    color: 'white'
+    color: 'white',
   },
   scrollView: {
-    padding:15
+    padding: 15,
   },
   section: {
-    paddingTop:30,
-    paddingBottom:5,
+    paddingTop: 30,
+    paddingBottom: 5,
     fontSize: 18,
     color: 'white',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   subSection: {
-    paddingTop:5,
+    paddingTop: 5,
     fontSize: 15,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   instructions: {
     paddingLeft: 5,
     backgroundColor: 'transparent',
     color: '#333333',
-    marginBottom: 5
+    marginBottom: 5,
   },
   line: {
-    width: "100%",
+    width: '100%',
     backgroundColor: 'grey',
     height: 1,
     marginTop: 5,
-    marginBottom: 5
+    marginBottom: 5,
   },
   buttonText: {
     fontSize: 16,
     color: '#46BCDE',
     marginTop: 5,
     marginBottom: 5,
-  }
+  },
 });
 
-export default AwesomeProject;
+export default ExampleProject;
