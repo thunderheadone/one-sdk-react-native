@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 
 
   s.dependency "React-Core"
-  s.dependency 'Thunderhead', '9.1.0'
+  s.dependency 'Thunderhead', '10.0.1'
   s.static_framework = true
   s.ios.deployment_target = '9.0'
 end
